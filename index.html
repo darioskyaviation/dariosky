@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Route Database</title>
+    <title>Simple Route Database with Supabase</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,10 +24,9 @@
             text-align: left;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@latest/dist/umd/supabase.js"></script>
 </head>
 <body>
-    <h1>Simple Route Database22</h1>
+    <h1>Simple Route Database with Supabase</h1>
 
     <!-- Form to Add Data -->
     <h2>Add Route</h2>
@@ -42,6 +41,18 @@
         <input type="number" id="distance" required><br>
 
         <button type="submit">Add Route</button>
+    </form>
+
+    <!-- Form to Search Data -->
+    <h2>Search Route</h2>
+    <form id="searchRouteForm">
+        <label for="searchDeparture">Departure Point:</label>
+        <input type="text" id="searchDeparture" required><br>
+
+        <label for="searchArrival">Arrival Point:</label>
+        <input type="text" id="searchArrival" required><br>
+
+        <button type="submit">Search Route</button>
     </form>
 
     <!-- Display Search Result -->
@@ -63,33 +74,17 @@
         </tbody>
     </table>
 
+    <!-- Include Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Initialize Supabase
-        const { createClient } = supabase;
-        const supabaseUrl = 'https://ejnnommopuqqkzbmzizm.supabase.co'; // Replace with your Supabase URL
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqbm5vbW1vcHVxcWt6Ym16aXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxNzQ2ODQsImV4cCI6MjA1Mzc1MDY4NH0.LRhe5LuGQV9vfUycv4U5ZjaWen-YXP4lx9RRMrhfBFk'; // Replace with your Supabase public API key
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
-        // Array to store routes (acting as a simple database)
-        let routesArray = []; // Initialize routes array
-
-        // Function to fetch all routes from Supabase
-        async function fetchRoutes() {
-            const { data: routes, error } = await supabase.from('routes').select('*');
-            if (error) {
-                console.error('Error fetching routes:', error.message);
-            } else {
-                routesArray = routes; // Store fetched routes
-                updateRouteTable();
-            }
-        }
-
-        // Fetch routes on page load
-        window.onload = fetchRoutes;
+        const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co'; // Replace with your Supabase URL
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGd2a3ZiYWV6eXF1ZHN5end6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxODk4MDgsImV4cCI6MjA1Mzc2NTgwOH0.jF1R7oOzRDd8HJmDC9JcImdnwAywWSSO-vxRxCPFfSA'; // Replace with your Supabase anon key
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
         // Function to add a route
         document.getElementById('addRouteForm').addEventListener('submit', async function (event) {
-            event.preventDefault(); // Prevent form default behavior
+            event.preventDefault(); // Prevent form submission
 
             // Get form values
             const departure = document.getElementById('departure').value;
@@ -98,25 +93,66 @@
 
             // Insert route into Supabase
             const { data, error } = await supabase
-                .from('routes')
-                .insert([{ departure, arrival, distance }]);
+                .from('route2') // Updated table name
+                .insert([{ departure, arrival, distance }])
+                .select();
 
             if (error) {
-                console.error('Error adding route:', error.message);
+                console.error('Error adding route:', error);
             } else {
+                console.log('Route added:', data);
                 // Clear the form
                 document.getElementById('addRouteForm').reset();
-                fetchRoutes(); // Refresh the routes list
+                // Update the table
+                fetchRoutes();
             }
         });
 
+        // Function to search for a route
+        document.getElementById('searchRouteForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get search values
+            const searchDeparture = document.getElementById('searchDeparture').value;
+            const searchArrival = document.getElementById('searchArrival').value;
+
+            // Search for the route in Supabase
+            const { data, error } = await supabase
+                .from('route2') // Updated table name
+                .select('*')
+                .eq('departure', searchDeparture)
+                .eq('arrival', searchArrival);
+
+            // Display the result
+            const resultElement = document.getElementById('searchResult');
+            if (data && data.length > 0) {
+                const route = data[0];
+                resultElement.textContent = `Distance from ${route.departure} to ${route.arrival} is ${route.distance} nm.`;
+            } else {
+                resultElement.textContent = 'Route not found.';
+            }
+        });
+
+        // Function to fetch and display all routes
+        async function fetchRoutes() {
+            const { data, error } = await supabase
+                .from('route2') // Updated table name
+                .select('*');
+
+            if (error) {
+                console.error('Error fetching routes:', error);
+            } else {
+                updateRouteTable(data);
+            }
+        }
+
         // Function to update the route table
-        function updateRouteTable() {
+        function updateRouteTable(routes) {
             const tableBody = document.querySelector('#routeTable tbody');
             tableBody.innerHTML = ''; // Clear the table
 
             // Add each route to the table
-            routesArray.forEach((route) => {
+            routes.forEach((route) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${route.departure}</td>
@@ -126,6 +162,9 @@
                 tableBody.appendChild(row);
             });
         }
+
+        // Fetch routes on page load
+        fetchRoutes();
     </script>
 </body>
 </html>
