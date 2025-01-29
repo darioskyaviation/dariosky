@@ -78,10 +78,11 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Initialize Supabase
-        const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co'; // Replace with your Supabase URL
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGd2a3ZiYWV6eXF1ZHN5end6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxODk4MDgsImV4cCI6MjA1Mzc2NTgwOH0.jF1R7oOzRDd8HJmDC9JcImdnwAywWSSO-vxRxCPFfSA'; // Replace with your Supabase anon key
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+      import { createClient } from '@supabase/supabase-js'
 
+const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
         // Function to add a route
         document.getElementById('addRouteForm').addEventListener('submit', async function (event) {
             event.preventDefault(); // Prevent form submission
@@ -91,16 +92,18 @@
             const arrival = document.getElementById('arrival').value;
             const distance = document.getElementById('distance').value;
 
+            console.log('Form values:', { departure, arrival, distance }); // Debugging
+
             // Insert route into Supabase
             const { data, error } = await supabase
-                .from('route2') // Updated table name
+                .from('route2')
                 .insert([{ departure, arrival, distance }])
                 .select();
 
             if (error) {
-                console.error('Error adding route:', error);
+                console.error('Error adding route:', error); // Debugging
             } else {
-                console.log('Route added:', data);
+                console.log('Route added:', data); // Debugging
                 // Clear the form
                 document.getElementById('addRouteForm').reset();
                 // Update the table
@@ -118,7 +121,7 @@
 
             // Search for the route in Supabase
             const { data, error } = await supabase
-                .from('route2') // Updated table name
+                .from('route2')
                 .select('*')
                 .eq('departure', searchDeparture)
                 .eq('arrival', searchArrival);
@@ -136,12 +139,13 @@
         // Function to fetch and display all routes
         async function fetchRoutes() {
             const { data, error } = await supabase
-                .from('route2') // Updated table name
+                .from('route2')
                 .select('*');
 
             if (error) {
-                console.error('Error fetching routes:', error);
+                console.error('Error fetching routes:', error); // Debugging
             } else {
+                console.log('Fetched routes:', data); // Debugging
                 updateRouteTable(data);
             }
         }
