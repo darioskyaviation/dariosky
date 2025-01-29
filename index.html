@@ -27,7 +27,7 @@
     </style>
 </head>
 <body>
-    <h></h>Route Database2</h1>
+    <h></h>Route Database3</h1>
 
     <!-- Form to Add Data -->
     <h2>Add Route</h2>
@@ -80,10 +80,10 @@
     // Initialize Supabase
   import { createClient } from '@supabase/supabase-js'
 
-const supabaseUrl = 'https://ejnnommopuqqkzbmzizm.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
-
+  const { createClient } = supabase;
+    const supabaseUrl = 'https://ejnnommopuqqkzbmzizm.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqbm5vbW1vcHVxcWt6Ym16aXptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxNzQ2ODQsImV4cCI6MjA1Mzc1MDY4NH0.LRhe5LuGQV9vfUycv4U5ZjaWen-YXP4lx9RRMrhfBFk'; // Replace with your Supabase public API key
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
