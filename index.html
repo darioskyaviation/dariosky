@@ -170,4 +170,143 @@
         fetchRoutes();
     </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Route Input</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <h1>Route Input Form</h1>
+  <form id="routeForm">
+    <label for="departure">Departure:</label>
+    <input type="text" id="departure" name="departure" required>
+
+    <label for="arrival">Arrival:</label>
+    <input type="text" id="arrival" name="arrival" required>
+
+    <label for="distance_nm">Distance (NM):</label>
+    <input type="number" id="distance_nm" name="distance_nm" step="0.01" required>
+
+    <button type="submit">Submit</button>
+  </form>
+
+  <h2>Route Table</h2>
+  <table id="routeTable">
+    <thead>
+      <tr>
+        <th>Departure</th>
+        <th>Arrival</th>
+        <th>Distance (NM)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be dynamically inserted here -->
+    </tbody>
+  </table>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    // Initialize Supabase
+    const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co'; // Replace with your Supabase URL
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGd2a3ZiYWV6eXF1ZHN5end6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxODk4MDgsImV4cCI6MjA1Mzc2NTgwOH0.jF1R7oOzRDd8HJmDC9JcImdnwAywWSSO-vxRxCPFfSA'; // Replace with your Supabase Anon Key
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+    // Function to fetch and display routes
+    async function fetchAndDisplayRoutes() {
+      const { data, error } = await supabase
+        .from('route2')
+        .select('*')
+        .order('id', { ascending: true }); // Order by ID or any other column
+
+      if (error) {
+        console.error('Error fetching data:', error);
+        return;
+      }
+
+      const tbody = document.querySelector('#routeTable tbody');
+      tbody.innerHTML = ''; // Clear existing rows
+
+      data.forEach((route) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${route.departure}</td>
+          <td>${route.arrival}</td>
+          <td>${route.distance_nm}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Handle form submission
+    document.getElementById('routeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const departure = document.getElementById('departure').value;
+      const arrival = document.getElementById('arrival').value;
+      const distance_nm = parseFloat(document.getElementById('distance_nm').value);
+
+      // Insert data into the route2 table
+      const { data, error } = await supabase
+        .from('route2')
+        .insert([{ departure, arrival, distance_nm }]);
+
+      if (error) {
+        console.error('Error inserting data:', error);
+        alert('An error occurred. Please try again.');
+      } else {
+        console.log('Data inserted successfully:', data);
+        alert('Route added successfully!');
+        document.getElementById('routeForm').reset(); // Clear the form
+        fetchAndDisplayRoutes(); // Refresh the table
+      }
+    });
+
+    // Fetch and display routes when the page loads
+    document.addEventListener('DOMContentLoaded', fetchAndDisplayRoutes);
+  </script>
+</body>
 </html>
