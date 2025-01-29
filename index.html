@@ -78,92 +78,86 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
-        // Initialize Supabase Client
-        const supabaseUrl = 'https://ejnnommopuqqkzbmzizm.supabase.co';
-        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqbm5vbW1vcHVxcWt6Ym16aXptIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczODE3NDY4NCwiZXhwIjoyMDUzNzUwNjg0fQ.WQcG4xuba4t9YLltXukg7MGWom-Zq36aSGpgjegcsAE';
-        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    // Initialize Supabase Client
+const supabaseUrl = 'https://ejnnommopuqqkzbmzizm.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqbm5vbW1vcHVxcWt6Ym16aXptIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczODE3NDY4NCwiZXhwIjoyMDUzNzUwNjg0fQ.WQcG4xuba4t9YLltXukg7MGWom-Zq36aSGpgjegcsAE';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        // Function to add a route
-        document.getElementById('addRouteForm').addEventListener('submit', async function (event) {
-            event.preventDefault(); // Prevent form submission
+// Add Route
+document.getElementById('addRouteForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
 
-            // Get form values
-            const departure = document.getElementById('departure').value;
-            const arrival = document.getElementById('arrival').value;
-            const distance = document.getElementById('distance').value;
+    const departure = document.getElementById('departure').value;
+    const arrival = document.getElementById('arrival').value;
+    const distance = document.getElementById('distance').value;
 
-            // Insert data into Supabase
-            const { data, error } = await supabase
-                .from('routes')
-                .insert([{ departure, arrival, distance }]);
+    const { data, error } = await supabase
+        .from('routes')
+        .insert([{ departure, arrival, distance }]);
 
-            if (error) {
-                console.error('Error inserting data:', error);
-            } else {
-                console.log('Data inserted successfully:', data);
-                // Clear the form
-                document.getElementById('addRouteForm').reset();
-                // Update the table
-                updateRouteTable();
-            }
-        });
-
-        // Function to search for a route
-        document.getElementById('searchRouteForm').addEventListener('submit', async function (event) {
-            event.preventDefault(); // Prevent form submission
-
-            // Get search values
-            const searchDeparture = document.getElementById('searchDeparture').value;
-            const searchArrival = document.getElementById('searchArrival').value;
-
-            // Query data from Supabase
-            const { data, error } = await supabase
-                .from('routes')
-                .select('*')
-                .eq('departure', searchDeparture)
-                .eq('arrival', searchArrival);
-
-            if (error) {
-                console.error('Error searching data:', error);
-            } else {
-                const resultElement = document.getElementById('searchResult');
-                if (data.length > 0) {
-                    const route = data[0];
-                    resultElement.textContent = `Distance from ${route.departure} to ${route.arrival} is ${route.distance} nm.`;
-                } else {
-                    resultElement.textContent = 'Route not found.';
-                }
-            }
-        });
-
-        // Function to update the route table
-        async function updateRouteTable() {
-            const tableBody = document.querySelector('#routeTable tbody');
-            tableBody.innerHTML = ''; // Clear the table
-
-            // Fetch data from Supabase
-            const { data, error } = await supabase
-                .from('routes')
-                .select('*');
-
-            if (error) {
-                console.error('Error fetching data:', error);
-            } else {
-                // Add each route to the table
-                data.forEach((route) => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${route.departure}</td>
-                        <td>${route.arrival}</td>
-                        <td>${route.distance}</td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            }
-        }
-
-        // Load routes when the page loads
+    if (error) {
+        console.error('Error adding route:', error);
+        alert('Failed to add route. Check console for details.');
+    } else {
+        console.log('Route added successfully:', data);
+        alert('Route added successfully!');
+        document.getElementById('addRouteForm').reset();
         updateRouteTable();
-    </script>
+    }
+});
+
+// Search Route
+document.getElementById('searchRouteForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const searchDeparture = document.getElementById('searchDeparture').value;
+    const searchArrival = document.getElementById('searchArrival').value;
+
+    const { data, error } = await supabase
+        .from('routes')
+        .select('*')
+        .eq('departure', searchDeparture)
+        .eq('arrival', searchArrival);
+
+    if (error) {
+        console.error('Error searching route:', error);
+        alert('Failed to search route. Check console for details.');
+    } else {
+        const resultElement = document.getElementById('searchResult');
+        if (data.length > 0) {
+            const route = data[0];
+            resultElement.textContent = `Distance from ${route.departure} to ${route.arrival} is ${route.distance} nm.`;
+        } else {
+            resultElement.textContent = 'Route not found.';
+        }
+    }
+});
+
+// Update Route Table
+async function updateRouteTable() {
+    const tableBody = document.querySelector('#routeTable tbody');
+    tableBody.innerHTML = '';
+
+    const { data, error } = await supabase
+        .from('routes')
+        .select('*');
+
+    if (error) {
+        console.error('Error fetching routes:', error);
+    } else {
+        data.forEach((route) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${route.departure}</td>
+                <td>${route.arrival}</td>
+                <td>${route.distance}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+    }
+}
+
+// Load routes when the page loads
+updateRouteTable();
 </body>
 </html>
