@@ -48,7 +48,7 @@
   </style>
 </head>
 <body>
-  <h1>Route Input Form</h1>
+  <h1>Route Input Form2</h1>
   <form id="routeForm">
     <label for="departure">Departure:</label>
     <input type="text" id="departure" name="departure" required>
@@ -78,17 +78,18 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Initialize Supabase
-    const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co'; // Replace with your Supabase URL
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGd2a3ZiYWV6eXF1ZHN5end6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxODk4MDgsImV4cCI6MjA1Mzc2NTgwOH0.jF1R7oOzRDd8HJmDC9JcImdnwAywWSSO-vxRxCPFfSA'; // Replace with your Supabase Anon Key
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+   
+import { createClient } from '@supabase/supabase-js'
 
+const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co'
+const supabaseKey = process.env.SUPABASE_KEY
+const supabase = createClient(supabaseUrl, supabaseKey)
     // Function to fetch and display routes
     async function fetchAndDisplayRoutes() {
       const { data, error } = await supabase
         .from('route2')
         .select('*')
-        .order('id', { ascending: true }); // Order by ID or any other column
+        .order('id', { ascending: true });
 
       if (error) {
         console.error('Error fetching data:', error);
@@ -117,19 +118,20 @@
       const arrival = document.getElementById('arrival').value;
       const distance_nm = parseFloat(document.getElementById('distance_nm').value);
 
-      // Insert data into the route2 table
+      console.log('Submitting data:', { departure, arrival, distance_nm }); // Debugging
+
       const { data, error } = await supabase
         .from('route2')
         .insert([{ departure, arrival, distance_nm }]);
 
       if (error) {
-        console.error('Error inserting data:', error);
+        console.error('Error inserting data:', error); // Debugging
         alert('An error occurred. Please try again.');
       } else {
-        console.log('Data inserted successfully:', data);
+        console.log('Data inserted successfully:', data); // Debugging
         alert('Route added successfully!');
-        document.getElementById('routeForm').reset(); // Clear the form
-        fetchAndDisplayRoutes(); // Refresh the table
+        document.getElementById('routeForm').reset();
+        fetchAndDisplayRoutes();
       }
     });
 
