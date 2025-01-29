@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Route Database</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        input, button {
+            margin: 5px;
+            padding: 8px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Simple Route Database</h1>
+
+    <!-- Form to Add Data -->
+    <h2>Add Route</h2>
+    <form id="addRouteForm">
+        <label for="departure">Departure Point:</label>
+        <input type="text" id="departure" required><br>
+
+        <label for="arrival">Arrival Point:</label>
+        <input type="text" id="arrival" required><br>
+
+        <label for="distance">Distance (nm):</label>
+        <input type="number" id="distance" required><br>
+
+        <button type="submit">Add Route</button>
+    </form>
+
+    <!-- Form to Search Data -->
+    <h2>Search Route</h2>
+    <form id="searchRouteForm">
+        <label for="searchDeparture">Departure Point:</label>
+        <input type="text" id="searchDeparture" required><br>
+
+        <label for="searchArrival">Arrival Point:</label>
+        <input type="text" id="searchArrival" required><br>
+
+        <button type="submit">Search Route</button>
+    </form>
+
+    <!-- Display Search Result -->
+    <h3>Search Result:</h3>
+    <p id="searchResult"></p>
+
+    <!-- Display All Routes -->
+    <h2>All Routes</h2>
+    <table id="routeTable">
+        <thead>
+            <tr>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Distance (nm)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Routes will be added here dynamically -->
+        </tbody>
+    </table>
+
+    <!-- Include Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // Initialize Supabase Client
+        const supabaseUrl = 'https://ejnnommopuqqkzbmzizm.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVqbm5vbW1vcHVxcWt6Ym16aXptIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTczODE3NDY4NCwiZXhwIjoyMDUzNzUwNjg0fQ.WQcG4xuba4t9YLltXukg7MGWom-Zq36aSGpgjegcsAE';
+        const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Function to add a route
+        document.getElementById('addRouteForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get form values
+            const departure = document.getElementById('departure').value;
+            const arrival = document.getElementById('arrival').value;
+            const distance = document.getElementById('distance').value;
+
+            // Insert data into Supabase
+            const { data, error } = await supabase
+                .from('routes')
+                .insert([{ departure, arrival, distance }]);
+
+            if (error) {
+                console.error('Error inserting data:', error);
+            } else {
+                console.log('Data inserted successfully:', data);
+                // Clear the form
+                document.getElementById('addRouteForm').reset();
+                // Update the table
+                updateRouteTable();
+            }
+        });
+
+        // Function to search for a route
+        document.getElementById('searchRouteForm').addEventListener('submit', async function (event) {
+            event.preventDefault(); // Prevent form submission
+
+            // Get search values
+            const searchDeparture = document.getElementById('searchDeparture').value;
+            const searchArrival = document.getElementById('searchArrival').value;
+
+            // Query data from Supabase
+            const { data, error } = await supabase
+                .from('routes')
+                .select('*')
+                .eq('departure', searchDeparture)
+                .eq('arrival', searchArrival);
+
+            if (error) {
+                console.error('Error searching data:', error);
+            } else {
+                const resultElement = document.getElementById('searchResult');
+                if (data.length > 0) {
+                    const route = data[0];
+                    resultElement.textContent = `Distance from ${route.departure} to ${route.arrival} is ${route.distance} nm.`;
+                } else {
+                    resultElement.textContent = 'Route not found.';
+                }
+            }
+        });
+
+        // Function to update the route table
+        async function updateRouteTable() {
+            const tableBody = document.querySelector('#routeTable tbody');
+            tableBody.innerHTML = ''; // Clear the table
+
+            // Fetch data from Supabase
+            const { data, error } = await supabase
+                .from('routes')
+                .select('*');
+
+            if (error) {
+                console.error('Error fetching data:', error);
+            } else {
+                // Add each route to the table
+                data.forEach((route) => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${route.departure}</td>
+                        <td>${route.arrival}</td>
+                        <td>${route.distance}</td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        // Load routes when the page loads
+        updateRouteTable();
+    </script>
+</body>
+</html>
