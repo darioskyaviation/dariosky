@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Route Input</title>
-  <style>
+   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -76,30 +76,33 @@
     </tbody>
   </table>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
   <script>
-    const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGd2a3ZiYWV6eXF1ZHN5end6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxODk4MDgsImV4cCI6MjA1Mzc2NTgwOH0.jF1R7oOzRDd8HJmDC9JcImdnwAywWSSO-vxRxCPFfSA'; // Replace with your actual Supabase key
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+ const firebaseConfig = {
+    apiKey: "AIzaSyAgWEH7vXqhMDz5OpFpt6VGNte3bJwkMlI",
+    authDomain: "route2-ce73d.firebaseapp.com",
+    projectId: "route2-ce73d",
+    storageBucket: "route2-ce73d.firebasestorage.app",
+    messagingSenderId: "929383553532",
+    appId: "1:929383553532:web:555694c3d97feee8b7fa79",
+    measurementId: "G-B367M28E6C"
+  };
 
-    console.log('Supabase client initialized:', supabase);
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+
+ 
 
     // Function to fetch and display routes
     async function fetchAndDisplayRoutes() {
-      const { data, error } = await supabase
-        .from('route2')
-        .select('*')
-        .order('id', { ascending: true });
-
-      if (error) {
-        console.error('Error fetching data:', error);
-        return;
-      }
-
+      const snapshot = await db.collection('routes').get();
       const tbody = document.querySelector('#routeTable tbody');
       tbody.innerHTML = ''; // Clear existing rows
 
-      data.forEach((route) => {
+      snapshot.forEach((doc) => {
+        const route = doc.data();
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${route.departure}</td>
@@ -118,21 +121,10 @@
       const arrival = document.getElementById('arrival').value;
       const distance_nm = parseFloat(document.getElementById('distance_nm').value);
 
-      console.log('Submitting data:', { departure, arrival, distance_nm }); // Debugging
-
-      const { data, error } = await supabase
-        .from('route2')
-        .insert([{ departure, arrival, distance_nm }]);
-
-      if (error) {
-        console.error('Error inserting data:', error); // Debugging
-        alert('An error occurred. Please try again.');
-      } else {
-        console.log('Data inserted successfully:', data); // Debugging
-        alert('Route added successfully!');
-        document.getElementById('routeForm').reset();
-        fetchAndDisplayRoutes();
-      }
+      await db.collection('routes').add({ departure, arrival, distance_nm });
+      alert('Route added successfully!');
+      document.getElementById('routeForm').reset();
+      fetchAndDisplayRoutes();
     });
 
     // Fetch and display routes when the page loads
