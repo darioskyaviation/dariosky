@@ -48,7 +48,7 @@
   </style>
 </head>
 <body>
-  <h1>Route Input Form2</h1>
+  <h1>Route Input Form222</h1>
   <form id="routeForm">
     <label for="departure">Departure:</label>
     <input type="text" id="departure" name="departure" required>
@@ -76,9 +76,11 @@
     </tbody>
   </table>
 
-  <script src="https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js"></script>
+ 
   <script>
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-analytics.js";
+  
     const firebaseConfig = {
     apiKey: "AIzaSyAgWEH7vXqhMDz5OpFpt6VGNte3bJwkMlI",
     authDomain: "route2-ce73d.firebaseapp.com",
@@ -93,8 +95,11 @@
   const app = initializeApp(firebaseConfig);
   const analytics = getAnalytics(app);
 
-    // Function to fetch and display routes
-    async function fetchAndDisplayRoutes() {
+   console.log("Firebase initialized:", app); // Debugging
+
+  // Function to fetch and display routes
+  async function fetchAndDisplayRoutes() {
+    try {
       const snapshot = await db.collection('routes').get();
       const tbody = document.querySelector('#routeTable tbody');
       tbody.innerHTML = ''; // Clear existing rows
@@ -109,31 +114,42 @@
         `;
         tbody.appendChild(row);
       });
+    } catch (error) {
+      console.error("Error fetching routes:", error); // Debugging
+    }
+  }
+
+  // Handle form submission
+  document.getElementById('routeForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const departure = document.getElementById('departure').value;
+    const arrival = document.getElementById('arrival').value;
+    const distance_nm = parseFloat(document.getElementById('distance_nm').value);
+
+    console.log("Form data:", { departure, arrival, distance_nm }); // Debugging
+
+    // Validate distance_nm
+    if (isNaN(distance_nm)) {
+      alert('Please enter a valid number for distance.');
+      return;
     }
 
-    // Handle form submission
-    document.getElementById('routeForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const departure = document.getElementById('departure').value;
-      const arrival = document.getElementById('arrival').value;
-      const distance_nm = parseFloat(document.getElementById('distance_nm').value);
-
-      // Validate distance_nm
-      if (isNaN(distance_nm)) {
-        alert('Please enter a valid number for distance.');
-        return;
-      }
-
-      // Add data to Firestore
-      await db.collection('routes').add({ departure, arrival, distance_nm });
+    // Add data to Firestore
+    try {
+      const docRef = await db.collection('routes').add({ departure, arrival, distance_nm });
+      console.log("Document written with ID:", docRef.id); // Debugging
       alert('Route added successfully!');
       document.getElementById('routeForm').reset();
       fetchAndDisplayRoutes();
-    });
+    } catch (error) {
+      console.error("Error adding document:", error); // Debugging
+      alert('An error occurred. Please try again.');
+    }
+  });
 
-    // Fetch and display routes when the page loads
-    document.addEventListener('DOMContentLoaded', fetchAndDisplayRoutes);
-  </script>
+  // Fetch and display routes when the page loads
+  document.addEventListener('DOMContentLoaded', fetchAndDisplayRoutes);
+</script>
 </body>
 </html>
