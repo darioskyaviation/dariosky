@@ -4,139 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Route Input</title>
-   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px;
-      text-align: left;
-    }
-    th {
-      background-color: #f2f2f2;
-    }
-    form {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      box-sizing: border-box;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #28a745;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #218838;
-    }
-  </style>
-</head>
-<body>
-  <h1>Route Input Form</h1>
-  <form id="routeForm">
-    <label for="departure">Departure:</label>
-    <input type="text" id="departure" name="departure" required>
-
-    <label for="arrival">Arrival:</label>
-    <input type="text" id="arrival" name="arrival" required>
-
-    <label for="distance_nm">Distance (NM):</label>
-    <input type="number" id="distance_nm" name="distance_nm" step="0.01" required>
-
-    <button type="submit">Submit</button>
-  </form>
-
-  <h2>Route Table</h2>
-  <table id="routeTable">
-    <thead>
-      <tr>
-        <th>Departure</th>
-        <th>Arrival</th>
-        <th>Distance (NM)</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Rows will be dynamically inserted here -->
-    </tbody>
-  </table>
-
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
-  <script>
- const firebaseConfig = {
-    apiKey: "AIzaSyAgWEH7vXqhMDz5OpFpt6VGNte3bJwkMlI",
-    authDomain: "route2-ce73d.firebaseapp.com",
-    projectId: "route2-ce73d",
-    storageBucket: "route2-ce73d.firebasestorage.app",
-    messagingSenderId: "929383553532",
-    appId: "1:929383553532:web:555694c3d97feee8b7fa79",
-    measurementId: "G-B367M28E6C"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-
- 
-
-    // Function to fetch and display routes
-    async function fetchAndDisplayRoutes() {
-      const snapshot = await db.collection('routes').get();
-      const tbody = document.querySelector('#routeTable tbody');
-      tbody.innerHTML = ''; // Clear existing rows
-
-      snapshot.forEach((doc) => {
-        const route = doc.data();
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${route.departure}</td>
-          <td>${route.arrival}</td>
-          <td>${route.distance_nm}</td>
-        `;
-        tbody.appendChild(row);
-      });
-    }
-
-    // Handle form submission
-    document.getElementById('routeForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const departure = document.getElementById('departure').value;
-      const arrival = document.getElementById('arrival').value;
-      const distance_nm = parseFloat(document.getElementById('distance_nm').value);
-
-      await db.collection('routes').add({ departure, arrival, distance_nm });
-      alert('Route added successfully!');
-      document.getElementById('routeForm').reset();
-      fetchAndDisplayRoutes();
-    });
-
-    // Fetch and display routes when the page loads
-    document.addEventListener('DOMContentLoaded', fetchAndDisplayRoutes);
-  </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Route Input</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -181,7 +48,7 @@
   </style>
 </head>
 <body>
-  <h1>Route Input Form</h1>
+  <h1>Route Input Form2</h1>
   <form id="routeForm">
     <label for="departure">Departure:</label>
     <input type="text" id="departure" name="departure" required>
