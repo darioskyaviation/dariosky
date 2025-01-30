@@ -48,7 +48,7 @@
   </style>
 </head>
 <body>
-  <h1>Route Input Form2</h1>
+  <h1>Route Input Form</h1>
   <form id="routeForm">
     <label for="departure">Departure:</label>
     <input type="text" id="departure" name="departure" required>
@@ -78,12 +78,12 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-   
-import { createClient } from '@supabase/supabase-js'
+    const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN1aGd2a3ZiYWV6eXF1ZHN5end6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzgxODk4MDgsImV4cCI6MjA1Mzc2NTgwOH0.jF1R7oOzRDd8HJmDC9JcImdnwAywWSSO-vxRxCPFfSA'; // Replace with your actual Supabase key
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-const supabaseUrl = 'https://cuhgvkvbaezyqudsyzwz.supabase.co'
-const supabaseKey = process.env.SUPABASE_KEY
-const supabase = createClient(supabaseUrl, supabaseKey)
+    console.log('Supabase client initialized:', supabase);
+
     // Function to fetch and display routes
     async function fetchAndDisplayRoutes() {
       const { data, error } = await supabase
